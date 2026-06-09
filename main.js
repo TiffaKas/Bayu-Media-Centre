@@ -1,4 +1,4 @@
-const PUBLIC_KEY = 'BAnLsOod5JFccYk31HZOzBAOtkuE_-kLt0hptAy_rJTQH3bBTPOjYVFRevKfDhaKzoduHc6ZsRMJOkZnjwTxu9g=';
+const PUBLIC_KEY = 'BK0unyUeErpZ_Pd2fXqAdrblVoKxRl8nKK_VR1-gNHUpgmTjmVGXB5tg0ltehyrxoTQK3XC5ZKbAeRkBS21J8Pw';
 
 // 必须：将 Base64 字符串转换为浏览器要求的 Uint8Array 二进制格式
 function urlBase64ToUint8Array(base64String) {
