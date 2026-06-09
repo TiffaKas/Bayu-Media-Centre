@@ -1,28 +1,37 @@
-const PUBLIC_KEY = 'BAnLsOod5JFccYk31HZOzBAOtkuE_-kLt0hptAy_rJTQH3bBTPOjYVFRevKfDhaKzoduHc6ZsRMJOkZnjwTxu9g='; // 保持不变
+const PUBLIC_KEY = 'BAnLsOod5JFccYk31HZOzBAOtkuE_-kLt0hptAy_rJTQH3bBTPOjYVFRevKfDhaKzoduHc6ZsRMJOkZnjwTxu9g=';
 
+// 必须：将 Base64 字符串转换为浏览器要求的 Uint8Array 二进制格式
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-    const rawData = atob(base64); // 使用标准全局 atob
-    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }
 
 async function subscribe() {
-    // 1. 确保等待 Service Worker 注册完成
+    // 1. 注册并确保 Service Worker 真正激活
     const reg = await navigator.serviceWorker.register('sw.js');
-    await navigator.serviceWorker.ready; 
+    await navigator.serviceWorker.ready;
 
-    // 2. 转换密钥格式
+    // 2. 将公钥转换为二进制格式
     const applicationServerKey = urlBase64ToUint8Array(PUBLIC_KEY);
 
-    // 3. 开始订阅
-    const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: applicationServerKey
-    });
-
-    console.log("成功！复制下面这段 JSON 到 Python 代码中:");
-    console.log(JSON.stringify(sub));
+    // 3. 执行订阅
+    try {
+        const sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey
+        });
+        
+        console.log("成功！请复制下方 JSON 字符串到 Python 代码的 SUBSCRIPTION_JSON 中：");
+        console.log(JSON.stringify(sub));
+    } catch (e) {
+        console.error("订阅出错：", e);
+    }
 }
 
 document.getElementById('btn').onclick = subscribe;
